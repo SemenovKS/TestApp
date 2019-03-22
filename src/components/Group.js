@@ -20,31 +20,39 @@ const styles = () => ({
 
     class FolderList extends React.Component {
         state = {
-            selectedIndex: 1,
+            selectedIndex: null,
         };
         handleListItemClick = (index) => {
             console.log(index);
             this.setState({selectedIndex: index});
         };
         render() {
-            const {classes} = this.props;
+            const {classes, items} = this.props;
+            const {selectedIndex} = this.state;
             return (
+                <React.Fragment>
+                    <b>{selectedIndex}</b>
                 <List className={classes.root}>
+                    {items.map((item,index) => (
                     <ListItem
+                        key={index}
                         button
-                        onClick={() => this.handleListItemClick(0)}
+                        onClick={() => this.handleListItemClick(index)}
                     >
                         <Avatar>
                         <ImageIcon/>
+                        {item}
                         </Avatar>
-                        <ListItemText primary="Photos" secondary="Jan 9, 2014"/>
+                        <ListItemText primary={"Photo #" + item} secondary="Jan 9, 2014"/>
                         <ListItemSecondaryAction>
                             <IconButton aria-label="Delete">
                                 <EditIcon/>
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
+                        ))}
                 </List>
+                </React.Fragment>
             );
         }
     }

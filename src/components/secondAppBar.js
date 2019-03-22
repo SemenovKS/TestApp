@@ -11,18 +11,20 @@ const styles = {
     },
 };
 
-function SimpleAppBar(props) {
-    const { classes } = props;
+class SimpleAppBar extends React.Component{
+    render(){
+    const { classes, add_item } = this.props;
 
     return (
         <div className={classes.root}>
             <AppBar position="static" color="default">
                 <Toolbar>
-                    <OutlinedTextFields/>
+                    <OutlinedTextFields add_item = {add_item}/>
                 </Toolbar>
             </AppBar>
         </div>
     );
+}
 }
 
 SimpleAppBar.propTypes = {
