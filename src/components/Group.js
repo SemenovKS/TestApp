@@ -43,7 +43,7 @@ const styles = () => ({
                         <ImageIcon/>
                         {item}
                         </Avatar>
-                        <ListItemText primary={"Photo #" + item} secondary="Jan 9, 2014"/>
+                        <ListItemText primary={"" + item} secondary="Jan 9, 2014"/>
                         <ListItemSecondaryAction>
                             <IconButton aria-label="Delete">
                                 <EditIcon/>
