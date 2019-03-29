@@ -7,12 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import red from '@material-ui/core/colors/red';
-const secondary = red[500];
 const styles = {
-    qq: {
-        color: secondary,
-    },
     root: {
         flexGrow: 1,
     },
@@ -28,7 +23,7 @@ function ButtonAppBar(props) {
     const { classes } = props;
     return (
         <div className={classes.root}>
-            <AppBar position="static" className={classes.qq}>
+            <AppBar position="static" color="secondary">
                 <Toolbar>
                     <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
                         <MenuIcon/>

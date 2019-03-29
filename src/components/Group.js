@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -27,13 +28,15 @@ const styles = () => ({
             this.setState({selectedIndex: index});
         };
         render() {
-            const {classes, items} = this.props;
+            const {classes, todos} = this.props;
             const {selectedIndex} = this.state;
+         const items = Object.keys(todos).map(key=>todos[key]);
             return (
                 <React.Fragment>
                     <b>{selectedIndex}</b>
                 <List className={classes.root}>
-                    {items.map((item,index) => (
+                    {items && items.length
+                    ? items.map((item,index) => (
                     <ListItem
                         key={index}
                         button
@@ -41,16 +44,17 @@ const styles = () => ({
                     >
                         <Avatar>
                         <ImageIcon/>
-                        {item}
+                        {index}
                         </Avatar>
-                        <ListItemText primary={ item} secondary="Jan 9, 2014"/>
+                        <ListItemText primary={item.content} secondary="Jan 9, 2014"/>
                         <ListItemSecondaryAction>
                             <IconButton aria-label="Delete">
                                 <EditIcon/>
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
-                        ))}
+                        ))
+                    :"Пусто"}
                 </List>
                 </React.Fragment>
             );
@@ -60,5 +64,10 @@ const styles = () => ({
 FolderList.propTypes = {
     classes: PropTypes.object.isRequired,
 };
+    const mapStateToProps = state => {
+        const todos = state.todos.byIds;
+        console.log(todos);
+        return { todos };
+    };
 
-export default withStyles(styles)(FolderList);
+export default connect(mapStateToProps)(withStyles(styles)(FolderList));
