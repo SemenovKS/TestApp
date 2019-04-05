@@ -1,5 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { refreshState } from "../Redux/actions";
+import  CacheManager from '../cache';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -10,6 +12,7 @@ import ImageIcon from '@material-ui/icons/Image';
 import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import EditIcon from '@material-ui/icons/Edit';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = () => ({
     root: {
@@ -20,16 +23,38 @@ const styles = () => ({
 });
 
     class FolderList extends React.Component {
-        state = {
-            selectedIndex: null,
-        };
+        constructor(){
+            super();
+            this.state = {
+                selectedIndex: null,
+            };
+            this.cache = new CacheManager();
+        }
         handleListItemClick = (index) => {
             console.log(index);
             this.setState({selectedIndex: index});
         };
+
+        refreshState = async () => {
+            const oldState = await this.cache.readData('state');
+            this.setState({loading:false})
+            if (!oldState){
+                // If oldState is null, save it locally
+                const data = this.state
+                this.cache.writeData('state',data)
+                return
+            }
+            this.props.refreshState(oldState)
+        }
+
+        componentWillMount = () => {
+            this.setState({loading:true});
+            this.refreshState()
+        }
+
         render() {
             const {classes, todos} = this.props;
-            const {selectedIndex} = this.state;
+            const {selectedIndex, loading} = this.state;
          const items = Object.keys(todos).map(key=>todos[key]);
             return (
                 <React.Fragment>
@@ -54,7 +79,10 @@ const styles = () => ({
                         </ListItemSecondaryAction>
                     </ListItem>
                         ))
-                    :"Пусто"}
+                    :(loading ?
+                            <CircularProgress/>
+                                : "Пусто")
+                    }
                 </List>
                 </React.Fragment>
             );
@@ -69,5 +97,8 @@ FolderList.propTypes = {
         console.log(todos);
         return { todos };
     };
+    const mapDispatchToProps = dispatch => ({
+        refreshState: state => dispatch(refreshState(state))
+    })
 
-export default connect(mapStateToProps)(withStyles(styles)(FolderList));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FolderList));

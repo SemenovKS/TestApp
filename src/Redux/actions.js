@@ -1,4 +1,4 @@
-import {ADD_TODO} from "./actionTypes";
+import {ADD_TODO,REFRESH_STATE} from "./actionTypes";
 
 let nextTodoId = 0;
 
@@ -9,3 +9,7 @@ export const addTodo = content => ({
         content
     }
 });
+export const refreshState = state => ({
+    type: REFRESH_STATE,
+    state
+})
