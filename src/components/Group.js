@@ -1,18 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { refreshState } from "../Redux/actions";
-import  CacheManager from '../cache';
+import { refreshState,markCompleted,editTodo } from "../Redux/actions";
+import CacheManager from '../cache';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
-import ImageIcon from '@material-ui/icons/Image';
-import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import EditIcon from '@material-ui/icons/Edit';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Checkbox from '@material-ui/core/Checkbox'
+import Divider from '@material-ui/core/Divider'
+import EditDialog from './editDialog';
 
 const styles = () => ({
     root: {
@@ -27,55 +26,56 @@ const styles = () => ({
             super();
             this.state = {
                 selectedIndex: null,
+                checked: [],
+                loading: false
             };
             this.cache = new CacheManager();
         }
-        handleListItemClick = (index) => {
-            console.log(index);
-            this.setState({selectedIndex: index});
-        };
+        handleListItemClick = (item) => {
+            this.props.markCompleted(item);
+            };
 
         refreshState = async () => {
             const oldState = await this.cache.readData('state');
             this.setState({loading:false})
             if (!oldState){
                 // If oldState is null, save it locally
-                const data = this.state
-                this.cache.writeData('state',data)
+                const data = this.state;
+                this.cache.writeData('state',data);
                 return
             }
             this.props.refreshState(oldState)
-        }
+        };
 
         componentWillMount = () => {
             this.setState({loading:true});
-            this.refreshState()
-        }
+            this.refreshState();
+        };
 
         render() {
-            const {classes, todos} = this.props;
+            const {classes, todos, editTodo} = this.props;
             const {selectedIndex, loading} = this.state;
-         const items = Object.keys(todos).map(key=>todos[key]);
+            const items = Object.keys(todos).map(key => todos[key]);
+
             return (
                 <React.Fragment>
                     <b>{selectedIndex}</b>
                 <List className={classes.root}>
                     {items && items.length
-                    ? items.map((item,index) => (
+                    ?  items.filter(x => !x.completed).map((item,index) => (
                     <ListItem
                         key={index}
                         button
-                        onClick={() => this.handleListItemClick(index)}
+                        onClick={() => this.handleListItemClick(item)}
                     >
-                        <Avatar>
-                        <ImageIcon/>
-                        {index}
-                        </Avatar>
-                        <ListItemText primary={item.content} secondary="Jan 9, 2014"/>
+                        <Checkbox
+                            checked={item.completed}
+                            tabIndex={-1}
+                            disableRipple
+                            />
+                        <ListItemText primary={item.content}/>
                         <ListItemSecondaryAction>
-                            <IconButton aria-label="Delete">
-                                <EditIcon/>
-                            </IconButton>
+                            <EditDialog item={item} editTodo={editTodo}/>
                         </ListItemSecondaryAction>
                     </ListItem>
                         ))
@@ -84,6 +84,25 @@ const styles = () => ({
                                 : "Пусто")
                     }
                 </List>
+                    <Divider />
+                    <List>
+                        {
+                            items.filter(x => x.completed).map((item,index) => (
+                                <ListItem
+                                key={index}
+                                button
+                                onClick={() => this.handleListItemClick(item)}
+                                >
+                                    <Checkbox
+                                        checked={item.completed}
+                                        tabIndex={-1}
+                                        disableRipple
+                                        />
+                                    <ListItemText primary={item.content} className='done-item'/>
+                                </ListItem>
+                            ))
+                        }
+                    </List>
                 </React.Fragment>
             );
         }
@@ -93,12 +112,13 @@ FolderList.propTypes = {
     classes: PropTypes.object.isRequired,
 };
     const mapStateToProps = state => {
-        const todos = state.todos.byIds;
-        console.log(todos);
+        const todos = state.todos;
         return { todos };
     };
     const mapDispatchToProps = dispatch => ({
-        refreshState: state => dispatch(refreshState(state))
-    })
+        refreshState: state => dispatch(refreshState(state)),
+        markCompleted: item => dispatch(markCompleted(item)),
+        editTodo: item => dispatch(editTodo(item))
+    });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FolderList));
