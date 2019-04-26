@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { refreshState,markCompleted,editTodo } from "../Redux/actions";
+import { refreshState,markCompleted,editTodo, deleteTodo } from "../Redux/actions";
 import CacheManager from '../cache';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -53,7 +53,7 @@ const styles = () => ({
         };
 
         render() {
-            const {classes, todos, editTodo} = this.props;
+            const {classes, todos, editTodo, deleteTodo} = this.props;
             const {selectedIndex, loading} = this.state;
             const items = Object.keys(todos).map(key => todos[key]);
 
@@ -75,7 +75,12 @@ const styles = () => ({
                             />
                         <ListItemText primary={item.content}/>
                         <ListItemSecondaryAction>
-                            <EditDialog item={item} editTodo={editTodo}/>
+                            <EditDialog
+                                item={item}
+                                itemIndex={index}
+                                editTodo={editTodo}
+                                deleteTodo={deleteTodo}
+                            />
                         </ListItemSecondaryAction>
                     </ListItem>
                         ))
@@ -118,7 +123,9 @@ FolderList.propTypes = {
     const mapDispatchToProps = dispatch => ({
         refreshState: state => dispatch(refreshState(state)),
         markCompleted: item => dispatch(markCompleted(item)),
-        editTodo: item => dispatch(editTodo(item))
+        editTodo: (item, itemIndex) => dispatch(editTodo(item, itemIndex)),
+        deleteTodo: (itemIndex) => dispatch(deleteTodo(itemIndex))
+
     });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FolderList));

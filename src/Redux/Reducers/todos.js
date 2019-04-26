@@ -1,5 +1,5 @@
 import CacheManager from '../../cache'
-import {ADD_TODO, REFRESH_STATE,MARK_COMPLETED, EDIT_TODO} from "../actionTypes";
+import {ADD_TODO, REFRESH_STATE,MARK_COMPLETED, EDIT_TODO, DELETE_TODO} from "../actionTypes";
 
 
 const initialState = [];
@@ -29,18 +29,23 @@ export default function (state = initialState, action) {
                 return old_item === item
                 ? {...old_item, completed: !old_item.completed }
                 : old_item
-            })
+            });
             cache.writeData('state', newState);
             return newState;
         }
 
         case EDIT_TODO: {
-            const { item } = action.payload;
-            newState = state.map((old_item) => {
-                return old_item === item
-                    ? {...old_item, content: item.content}
-                    : old_item
-            })
+            const { item, itemIndex } = action.payload;
+            newState = [...state];
+            newState[itemIndex] = item;
+            cache.writeData('state', newState);
+            return newState;
+        }
+
+        case DELETE_TODO: {
+            const { itemIndex } = action.payload;
+            newState = [...state];
+            newState.splice(itemIndex, 1);
             cache.writeData('state', newState);
             return newState;
         }

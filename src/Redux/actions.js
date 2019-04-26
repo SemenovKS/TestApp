@@ -1,4 +1,4 @@
-import {ADD_TODO, REFRESH_STATE, MARK_COMPLETED, EDIT_TODO} from "./actionTypes";
+import {ADD_TODO, REFRESH_STATE, MARK_COMPLETED, EDIT_TODO, DELETE_TODO} from "./actionTypes";
 
 
 let nextTodoId = 0;
@@ -22,9 +22,17 @@ export const markCompleted = item => ({
     }
 });
 
-export const editTodo = item => ({
+export const editTodo = (item, itemIndex) => ({
     type: EDIT_TODO,
     payload: {
-        item
+        item,
+        itemIndex,
     }
 })
+
+export const deleteTodo = (itemIndex) => ({
+    type: DELETE_TODO,
+    payload: {
+        itemIndex,
+    }
+});

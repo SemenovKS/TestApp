@@ -6,6 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -13,8 +14,10 @@ const styles ={
     green: {
         color: 'green',
     },
+    red: {
+        color: 'red',
+    },
 };
-
 class EditDialog extends React.Component {
     state = {
         open: false,
@@ -28,7 +31,7 @@ class EditDialog extends React.Component {
     };
 
     handleListItemSave = () => {
-        this.props.editTodo(this.state.editItem);
+        this.props.editTodo(this.state.editItem, this.props.itemIndex);
         this.setState({ open: false });
     };
 
@@ -38,6 +41,13 @@ class EditDialog extends React.Component {
 
     handleClose = () => {
         this.setState({ open: false });
+    };
+
+    handleClickDelete = () => {
+        if (window.confirm(`Подтвердите удаление элемента ${this.state.editItem.content}.`)) {
+            this.props.deleteTodo(this.props.itemIndex);
+            this.setState({open: false});
+        };
     };
 
     render() {
@@ -67,6 +77,9 @@ class EditDialog extends React.Component {
                         />
                     </DialogContent>
                     <DialogActions>
+                        <Button onClick={this.handleClickDelete} className={classes.red}>
+                            <DeleteIcon/>
+                        </Button>
                         <Button onClick={this.handleClose} color="primary">
                             Отмена
                         </Button>
